@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dreamfish.backend.dao.DeviceMapper">
+
+    <!-- 字段映射 -->
+    <resultMap id="BaseResultMap" type="com.dreamfish.backend.entity.Device">
+        <result column="device_id" property="deviceId"/>
+        <result column="user_id" property="userId"/>
+        <result column="api_key" property="apiKey"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="city" property="city"/>
+        <result column="full_address" property="fullAddress"/>
+        <result column="created_at" property="registerTime"/>
+        <result column="description" property="description"/>
+        <result column="version" property="version"/>
+        <result column="status" property="status" typeHandler="com.dreamfish.backend.common.GenericStatusTypeHandler"
+                javaType="com.dreamfish.backend.entity.status.DeviceStatus"/>
+        <association property="geoPosition" javaType="com.dreamfish.backend.entity.GeoPosition">
+            <result column="latitude" property="latitude"/>
+            <result column="longitude" property="longitude"/>
+        </association>
+    </resultMap>
+
+    <!-- 更新设备状态 -->
+    <update id="updateDeviceStatus">
+        UPDATE t_device
+        SET status  = #{status.code},
+            version = version + 1
+        WHERE device_id = #{deviceId}
+          AND is_deleted = 0
+          <if test="version != null">
+              AND version = #{version}
+          </if>
+    </update>
+
+    <!-- 删除设备 -->
+    <update id="deleteDevice">
+        UPDATE t_device
+        SET is_deleted = 1,
+            version    = version + 1
+        WHERE device_id = #{deviceId}
+          AND version = #{version}
+    </update>
+
+    <!--重新注册设备-->
+    <update id="reenrollDevice">
+        UPDATE t_device
+        SET is_deleted = 0,
+             status = 0,
+             user_id=#{userId},
+             api_key=#{apiKey},
+             latitude=#{geoPosition.latitude},
+             longitude=#{geoPosition.longitude},
+             city=#{city},
+             full_address=#{fullAddress},
+             description=#{description}
+        WHERE device_id = #{deviceId}
+    </update>
+
+    <!-- 根据设备ID查询设备信息 -->
+    <select id="findByDeviceId" resultMap="BaseResultMap" parameterType="int">
+        SELECT device_id,
+               user_id,
+               api_key,
+               latitude,
+               longitude,
+               status,
+               city,
+               full_address,
+               version,
+               is_deleted,
+               created_at
+        FROM t_device
+        WHERE device_id = #{deviceId}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 根据条件查询设备信息 -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT * FROM t_device
+        <where>
+            is_deleted = 0
+            AND user_id = #{userId}
+            <if test="deviceId != null">
+                AND CAST(device_id AS CHAR) LIKE CONCAT('%', #{deviceId}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status.code}
+            </if>
+        </where>
+        ORDER BY device_id ASC
+    </select>
+
+    <!--查询设备记录是否存在-->
+    <select id="findDeviceRecord" resultMap="BaseResultMap" parameterType="int">
+        SELECT device_id,
+               user_id,
+               api_key,
+               latitude,
+               longitude,
+               status,
+               city,
+               full_address,
+               version,
+               is_deleted,
+               created_at
+        FROM t_device
+        WHERE device_id = #{deviceId}
+    </select>
+
+    <!-- 插入设备信息 -->
+    <insert id="insertDevice" parameterType="Device" useGeneratedKeys="true" keyProperty="deviceId">
+        INSERT INTO t_device (device_id,
+                              user_id,
+                              api_key,
+                              latitude,
+                              longitude,
+                              city,
+                              full_address,
+                              description)
+        VALUES (#{deviceId},
+                #{userId},
+                #{apiKey},
+                #{geoPosition.latitude},
+                #{geoPosition.longitude},
+                #{city},
+                #{fullAddress},
+                #{description})
+    </insert>
+</mapper>

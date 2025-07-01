@@ -1,0 +1,24 @@
+package com.dreamfish.backend.entity.status;
+
+import com.dreamfish.backend.common.BaseStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * @author Dream fish
+ * @version 1.0
+ * @description: 维修人员状态
+ * @date 2025/4/12 11:59
+ */
+@Getter
+@AllArgsConstructor
+public enum WorkerStatus implements BaseStatus {
+    FREE(0, "0:空闲"),
+    BUSY(1, "1:忙碌");
+    private final int code;
+    private final String description;
+
+    public static WorkerStatus fromCode(int code) {
+        return BaseStatus.fromCode(WorkerStatus.class, code);
+    }
+}

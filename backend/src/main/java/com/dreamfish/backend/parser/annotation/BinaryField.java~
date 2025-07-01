@@ -1,0 +1,79 @@
+package com.dreamfish.backend.parser.annotation;
+
+import com.dreamfish.backend.parser.group.Default;
+
+import java.lang.annotation.*;
+
+/**
+ * @author Dream fish
+ * @version 1.0
+ * @description: 二进制数据字段注解
+ * @date 2025/4/3 15:13
+ */
+@Retention(RetentionPolicy.RUNTIME) // 注解在运行时可用
+@Target({ElementType.FIELD, ElementType.TYPE}) //  注解可以用在字段和类上
+@Documented // 生成文档时包含注解信息
+public @interface BinaryField {
+    /**
+     * 字段优先级,优先级越小越先解析
+     *
+     * @return int
+     */
+    int order() default -1;
+
+    /**
+     * 字段字节长度, 0 则按照 java 类型长度解析
+     *
+     * @return int
+     */
+    int length() default 0;
+
+    /**
+     * Float、Double、BigDecimal 类型的精度,默认0,表示当前字段非小数类型。
+     * 一般小数类型需要转换为整数存储,如:0.01 -> 1,则scale=2
+     *
+     * @return int
+     */
+    int scale() default 0;
+
+    /**
+     * String 字符串编码格式,默认 UTF-8,注意使用Charset.forName()支持的编码格式
+     *
+     * @return Class<?>
+     */
+    String charset() default "UTF-8";
+
+    /**
+     * 字段类型,默认false,表示当前字段非 自定义对象类型
+     *
+     * @return Class<?>
+     */
+    boolean nested() default false;
+
+
+    // 嵌套对象类型(nested=true生效),默认Void.class,不提供后续会解析为当前属性类型
+    //Class<?> nestedType() default Void.class;
+
+    /**
+     * 字段描述,默认空(没啥用,哈哈)
+     *
+     * @return String
+     */
+    String description() default "";
+
+    /**
+     * 字段分组,默认分组为Default.class,解析式仅解析选中分组的字段
+     * 学习一下 JSR303 的分组校验
+     *
+     * @return Class<?>
+     */
+    Class<?>[] groups() default {
+            Default.class
+    };
+
+    // 是否有符号,默认false,表示当前字段无符号(布尔类型无需校验对应值是否合法,舒服)
+    // boolean signed() default false;
+
+    //特殊格式说明,如时间戳格式:懒得考虑
+    //String format() default "";
+}

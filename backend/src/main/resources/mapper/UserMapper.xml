@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dreamfish.backend.dao.UserMapper">
+
+    <!-- 结果映射集 -->
+    <resultMap id="BaseResultMap" type="com.dreamfish.backend.entity.User">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <!-- 更新密码 -->
+    <update id="updatePassword">
+        UPDATE t_user
+        SET password = #{password}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="findByUsername" parameterType="string" resultMap="BaseResultMap">
+        SELECT user_id, username, password, email, is_deleted
+        FROM t_user
+        WHERE username = #{userName}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 根据邮箱查询用户 -->
+    <select id="findByEmail" resultMap="BaseResultMap">
+        SELECT user_id,
+               username
+        FROM t_user
+        WHERE email = #{email}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 根据ID查询用户 -->
+    <select id="getById" resultType="User">
+        SELECT user_id,
+               username,
+               email
+        FROM t_user
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 新增用户 -->
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true"
+            keyProperty="userId">
+        INSERT INTO t_user (username,
+                            password,
+                            email)
+        VALUES (#{userName},
+                #{password},
+                #{email})
+    </insert>
+</mapper>

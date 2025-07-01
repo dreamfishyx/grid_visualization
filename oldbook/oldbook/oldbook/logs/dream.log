@@ -1,0 +1,8 @@
+2023-11-30T10:12:08.196+08:00  INFO 1676 --- [main] c.d.sea.oldbook.OldbookApplicationTests  : Starting OldbookApplicationTests using Java 17.0.6 with PID 1676 (started by yxlum in D:\oldbook)
+2023-11-30T10:12:08.198+08:00  INFO 1676 --- [main] c.d.sea.oldbook.OldbookApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2023-11-30T10:12:09.131+08:00  INFO 1676 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2023-11-30T10:12:09.167+08:00  INFO 1676 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 29 ms. Found 0 JDBC repository interfaces.
+2023-11-30T10:12:11.025+08:00  INFO 1676 --- [main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2023-11-30T10:12:11.796+08:00  INFO 1676 --- [main] c.d.sea.oldbook.OldbookApplicationTests  : Started OldbookApplicationTests in 4.088 seconds (process running for 5.568)
+2023-11-30T10:12:13.100+08:00  INFO 1676 --- [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closing ...
+2023-11-30T10:12:13.109+08:00  INFO 1676 --- [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} closed

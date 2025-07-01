@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dreamfish.backend.dao.WorkerMapper">
+
+    <!-- 结果映射集 -->
+    <resultMap id="baseResultMap" type="com.dreamfish.backend.entity.Worker">
+        <id column="worker_id" property="workerId"/>
+        <result column="name" property="name"/>
+        <result column="email" property="email"/>
+        <result column="user_id" property="userId"/>
+        <result column="version" property="version"/>
+        <result column="status" property="status" typeHandler="com.dreamfish.backend.common.GenericStatusTypeHandler"
+                javaType="com.dreamfish.backend.entity.status.WorkerStatus"/>
+        <result column="gender" property="gender" typeHandler="com.dreamfish.backend.common.GenericStatusTypeHandler"
+                javaType="com.dreamfish.backend.entity.status.Gender"/>
+    </resultMap>
+
+    <!-- 新增维修人员 -->
+    <insert id="insertWorker" useGeneratedKeys="true" keyProperty="workerId">
+        INSERT INTO t_worker ( name, email, user_id,gender)
+        VALUES (
+                #{name},
+                #{email},
+                #{userId},
+                #{gender.code})
+    </insert>
+
+    <!-- 更新维修人员信息 -->
+    <update id="updateWorkerInfo">
+        UPDATE t_worker
+        SET name  = #{name},
+            email = #{email},
+            version = version + 1
+        WHERE worker_id = #{workerId}
+          AND is_deleted = 0
+          <if test="version != null">
+              AND version = #{version}
+          </if>
+    </update>
+
+    <!-- 删除维修人员 -->
+    <update id="deleteWorker">
+        UPDATE t_worker
+        SET is_deleted = 1,
+            version    = version + 1
+        WHERE worker_id = #{workerId}
+          AND version = #{version}
+    </update>
+
+    <!-- 更新维修人员状态 -->
+    <update id="updateWorkerStatus">
+        UPDATE t_worker
+        SET status = #{status.code},
+        version=version + 1
+        WHERE worker_id = #{workerId}
+        AND is_deleted = 0
+        <if test="version != null">
+            AND version = #{version}
+        </if>
+    </update>
+
+    <!-- 获取所有维修人员 -->
+    <select id="getWorkers" resultMap="baseResultMap">
+        SELECT worker_id, name, email, user_id, gender, status
+        FROM t_worker
+        WHERE is_deleted = 0
+        AND user_id = #{userId}
+        <if test="gender != null">
+            AND gender = #{gender.code}
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+    </select>
+
+    <!-- 获取单个维修人员(需要返回version字段) -->
+    <select id="getWorker" resultMap="baseResultMap">
+        SELECT worker_id, name, email, user_id,gender,status,version
+        FROM t_worker
+        WHERE worker_id = #{workerId}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 获取首个空闲维修人员 -->
+    <select id="getFirstFreeWorker" resultMap="baseResultMap">
+        SELECT worker_id, name, email, user_id, gender,status
+        FROM t_worker
+        WHERE is_deleted = 0
+          AND status = 0
+        LIMIT 1
+    </select>
+</mapper>

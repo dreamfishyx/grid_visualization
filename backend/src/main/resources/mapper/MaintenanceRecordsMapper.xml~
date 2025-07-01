@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dreamfish.backend.dao.MaintenanceRecordsMapper">
+
+    <!-- 结果映射集 -->
+    <resultMap id="baseResultMap" type="maintenanceRecord">
+        <id column="id" property="id"/>
+        <result column="description" property="description"/>
+        <result column="user_id" property="userId"/>
+        <result column="process" property="process"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="description" property="description"/>
+        <result column="finished_at" property="finishedAt"/>
+        <result column="device_id" property="deviceId"/>
+        <result column="status" property="status" typeHandler="com.dreamfish.backend.common.GenericStatusTypeHandler"
+                javaType="com.dreamfish.backend.entity.status.MaintenanceRecordStatus"/>
+        <association property="worker" javaType="com.dreamfish.backend.entity.Worker">
+            <result column="worker_name" property="name"/>
+            <result column="worker_id" property="workerId"/>
+        </association>
+    </resultMap>
+
+    <!-- 新增维修记录 -->
+    <insert id="insertMaintenanceRecords" keyProperty="id" useGeneratedKeys="true">
+         INSERT INTO t_repair_record (device_id,
+         user_id,
+         worker_id)
+         values (#{deviceId}, #{userId}, #{worker.workerId})
+    </insert>
+
+    <!-- 更新维修记录 -->
+    <update id="updateMaintenanceRecords" useGeneratedKeys="true" keyProperty="id">
+         update t_repair_record
+         set description = #{description},
+         process = #{process},
+         finished_at = #{finishedAt},
+         status = #{status.code}
+         where id = #{id}
+    </update>
+
+    <update id="deleteRecordWithDeviceId" useGeneratedKeys="true" keyProperty="id">
+        update t_repair_record
+        set is_deleted = 1
+        where device_id = #{deviceId}
+    </update>
+
+    <select id="findAllMaintenanceRecords" resultMap="baseResultMap">
+        SELECT
+        r.id,
+        r.device_id,
+        r.worker_id,
+        w.name AS worker_name,
+        r.description,
+        r.status,
+        r.created_at,
+        r.finished_at,
+        r.process
+        FROM t_repair_record r
+        LEFT JOIN t_worker w ON w.worker_id = r.worker_id
+        WHERE
+        r.is_deleted = 0
+        AND r.user_id = #{userId}
+        <if test="search != null and search != ''">
+            AND (
+            CAST(r.device_id AS CHAR) LIKE CONCAT('%', #{search}, '%')
+            OR
+            w.name LIKE CONCAT('%', #{search}, '%')
+            )
+        </if>
+        <if test="status != null">
+            AND r.status = #{status.code}
+        </if>
+        <if test="startTime != null">
+            AND r.created_at >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND r.created_at &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!-- 获取维修记录 -->
+    <select id="findMaintenanceRecordById" resultMap="baseResultMap">
+        SELECT r.id,
+         r.device_id,
+         r.worker_id,
+         w.name AS worker_name,
+         r.description,
+         r.process,
+         r.status,
+         r.created_at
+         FROM t_repair_record r
+         LEFT JOIN t_worker w ON w.worker_id = r.worker_id
+         WHERE r.is_deleted = 0
+         and r.id = #{id}
+    </select>
+
+    <!--获取维修记录 -->
+    <select id="findMaintenanceRecordByDeviceId" resultMap="baseResultMap">
+         SELECT id,
+         device_id,
+         worker_id,
+         description,
+         status,
+         created_at
+         FROM t_repair_record
+         WHERE is_deleted = 0
+         and device_id = #{deviceId}
+    </select>
+
+</mapper>

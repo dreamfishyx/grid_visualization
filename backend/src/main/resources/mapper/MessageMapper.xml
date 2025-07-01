@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dreamfish.backend.dao.MessageMapper">
+
+    <resultMap id="baseResultMap" type="com.dreamfish.backend.entity.Message">
+        <id column="message_id" property="messageId"/>
+        <result column="user_id" property="userId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="created_at" property="createTime"/>
+        <result column="has_read" property="hasRead" typeHandler="com.dreamfish.backend.common.GenericStatusTypeHandler"
+                javaType="com.dreamfish.backend.entity.status.MessageStatus"/>
+        <result column="type" property="type" typeHandler="com.dreamfish.backend.common.GenericStatusTypeHandler"
+                javaType="com.dreamfish.backend.entity.status.MessageType"/>
+    </resultMap>
+
+    <!-- 获取所有未读消息: 按照创建时间降序排列 -->
+    <select id="findAllUnreadMessages" resultMap="baseResultMap">
+        SELECT message_id,
+               user_id,
+               title,
+               content,
+               type,
+               has_read,
+               created_at
+        FROM t_message
+        WHERE is_deleted = 0
+        AND user_id = #{userId}
+        AND has_read = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 新增消息 -->
+    <insert id="insertMessage" parameterType="Message" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO t_message (user_id,title,content,type)
+        VALUES (#{userId},#{title},#{content},#{type.code})
+    </insert>
+
+    <!-- 更新已读状态 -->
+    <update id="updateMessageStatus">
+        UPDATE t_message
+        SET has_read = #{hasRead.code}
+        WHERE message_id = #{messageId}
+          AND is_deleted = 0
+    </update>
+</mapper>

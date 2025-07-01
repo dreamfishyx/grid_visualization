@@ -1,0 +1,83 @@
+services:
+  mysql:
+    image: mysql:${MYSQL_VERSION}
+    container_name: mysql
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - ${ROOT_PATH}/mysql/data:/var/lib/mysql
+      - ${ROOT_PATH}/mysql/conf:/etc/mysql/conf.d
+      - ${ROOT_PATH}/mysql/logs:/var/log/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    #      - default-authentication-plugin=mysql_native_password
+    restart: always
+    networks:
+      - grid
+
+  influxdb:
+    image: influxdb:${INFLUXDB_VERSION}
+    container_name: influxdb
+    ports:
+      - "${INFLUXDB_PORT:-8086}:8086"
+    volumes:
+      - ${ROOT_PATH}/influxdb:/var/lib/influxdb2
+      - ${ROOT_PATH}/influxdb/config:/etc/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_ADMIN_TOKEN}
+    restart: always
+    networks:
+      - grid
+
+  kafka:
+    image: apache/kafka:${KAFKA_VERSION}
+    container_name: kafka
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+      - "9093:9093"
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=C.UTF-8
+      - KAFKA_NODE_ID=1
+      - CLUSTER_ID=kafka-cluster
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${host_ip:-127.0.0.1}:${KAFKA_PORT:-9092}
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      # 显式配置 __consumer_offsets 的副本数（必须 ≤ Broker 总数）
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      # 启用消费者组协调器
+      - KAFKA_GROUP_COORDINATOR_REBALANCE_PROTOCOLS=classic,consumer
+    privileged: true
+    networks:
+      - grid
+
+  redis:
+    image: redis:${REDIS_VERSION}
+    container_name: redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - ${ROOT_PATH}/redis/data:/data
+      - ${ROOT_PATH}/redis/conf:/etc/redis
+    privileged: true
+    command:
+      - redis-server
+      - /etc/redis/redis.conf
+    networks:
+      - grid
+
+networks:
+  grid:
+    name: grid_visualization
+    driver: bridge
+    attachable: false

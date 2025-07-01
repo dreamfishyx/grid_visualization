@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'yy', sans-serif;
+    background-image: url(https://cdn.jsdelivr.net/gh/dreamfishyx/pictures@main/img/2023-11-09-09-20-37-6a4931.png);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+#login {
+    height: 400px;
+    width: 390px;
+    background-color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 10px;
+    margin: auto 100px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.19);
+    margin-top: 150px;
+    margin-left: 130px;
+}
+
+#logo img {
+    width: 120px;
+    height: 50px;
+    margin: 30px auto;
+    margin-top: 35px;
+}
+
+input {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    outline: medium;
+    width: 60%;
+    padding: 9px 5px;
+    font-size: 16px;
+}
+
+input:focus {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    outline: medium;
+}
+
+label {
+    text-align: left;
+    display: inline-block;
+    width: 70px;
+    color: #333;
+}
+
+.in_div {
+    background-color: transparent;
+    display: inline-block;
+    width: auto;
+    border-bottom: 1px solid #333;
+    /*margin-bottom: px;*/
+    text-align: left;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    display: inline-block;
+    margin-bottom: 27px;
+}
+
+.but_div {
+    background-color: transparent;
+    display: inline-block;
+    width: auto;
+    margin-bottom: 30px;
+}
+
+.other_div {
+    /* width: 100%; */
+    width: auto;
+    height: 30px;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+}
+
+.other_div a {
+    display: inline;
+    width: 80px;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+
+button {
+    width: 57px;
+    height: 27px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    /* background-color: transparent; */
+    background-color: rgba(0, 0, 0, 0.19);
+    border: none;
+}

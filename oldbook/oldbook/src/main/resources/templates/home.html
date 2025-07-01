@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home</title>
+    <link th:href="@{/css/base.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/home.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet" type="text/css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<body>
+<!--导航栏-->
+<nav class="navbar" th:fragment="navbar">
+    <!-- 导航栏内容 -->
+    <div id="logo">
+        <img th:src="@{/pic/logo.png}" alt="logo" class="logo">
+    </div>
+    <div class="navbar-content">
+        <span class="word">[[${word.content}]]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
+                onclick="openModal(event,'word_overlay')" title="新增"><i
+                class="fa fa-plus" aria-hidden="true"></i></a></span>
+        <!-- 导航链接 -->
+        <a class="link" th:href="@{/home}" title="首页"><i class="fa fa-home" aria-hidden="true"></i></a>
+        <a class="link" th:href="@{/user/logout}" title="退出"><i class="fa fa-sign-out"
+                                                                  aria-hidden="true"></i></a>
+        <!-- 删除 fa-trash -->
+        <!-- 添加 fa-plus-square -->
+        <!--        <i class="fa fa-sign-out" aria-hidden="true"></i>-->
+    </div>
+</nav>
+<div id="counts">
+    <div th:id="${'diary'}" th:if="${#lists.isEmpty(pageInfo.list)}">
+        <span class="span">日记:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a th:href="@{/diary/to/create}"
+                                                                                         title="新增"><i
+                class="fa fa-plus" aria-hidden="true"></i></a></span>
+        <br><br>
+        您未创建任何日记！
+    </div>
+    <div id="diary" th:if="${!#lists.isEmpty(pageInfo.list)}">
+        <span class="span">日记:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a th:href="@{/diary/to/create}"
+                                                                                         title="新增"><i
+                class="fa fa-plus" aria-hidden="true"></i></a></span>
+        <div class="item" th:each="diary : ${pageInfo.list}">
+            <span th:text="${diary.createTime}">2023.11.29</span>
+            <a th:href="@{/diary/show(diaryId=${diary.diaryId})}" class="item_link">
+                [[${diary.title}]]
+                <a th:href="@{/diary/delete(diaryId=${diary.diaryId})}" class="del_link"><i class="fa fa-trash"
+                                                                                            aria-hidden="true"></i></a>
+            </a>
+        </div>
+        <ul>
+            <li><a th:if="${pageInfo.hasPreviousPage}" th:href="@{/home(pageNum=${pageInfo.pageNum}-1)}">&lt;</a></li>
+            <li th:each="i : ${#numbers.sequence(1, pageInfo.pages)}"
+                th:class="${i == pageInfo.pageNum} ? 'active' : ''">
+                <a th:href="@{/home(pageNum=${i})}" th:text="${i}">1</a>
+            </li>
+            <li><a th:if="${pageInfo.hasNextPage}" th:href="@{/home(pageNum=${pageInfo.pageNum}+1)}">&gt;</a></li>
+        </ul>
+    </div>
+
+    <hr/>
+
+    <div id="plan" th:if="${!#lists.isEmpty(planList)}">
+            <span class="span">待办(&nbsp;&nbsp;&nbsp;<a class="handoff" th:href="@{/home(mode='did')}"
+                                                         title="已完成"><i
+                    class="fa fa-calendar-check-o" aria-hidden="true"></i></a>&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;<a
+                    class="handoff"
+                    th:href="@{/home(mode='undo')}"
+                    title="未完成"><i
+                    class="fa fa-calendar-times-o" aria-hidden="true"></i></a>&nbsp;&nbsp;&nbsp;):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
+                    onclick="openModal(event,'plan_overlay')"
+                    title="新增"><i
+                    class="fa fa-plus" aria-hidden="true"></i></a></span>
+        <div class="item" th:each="plan : ${planList}" th:if="${mode}=='undo'">
+            <input class="check" type="checkbox" th:attr="planId=${plan.planId}">
+            <a class="item_link">
+                [[${plan.content}]]
+                <a th:href="@{/plan/delete(planId=${plan.planId})}" class="del_link"><i class="fa fa-trash"
+                                                                                        aria-hidden="true"></i></a>
+            </a>
+        </div>
+        <div class="item" th:each="plan : ${planList}" th:if="${mode}=='did'">
+            <input class="check" type="checkbox" th:attr="planId=${plan.planId}" disabled>
+            <a class="item_link">
+                [[${plan.content}]]
+                <a th:href="@{/plan/delete(planId=${plan.planId})}" class="del_link"><i class="fa fa-trash"
+                                                                                        aria-hidden="true"></i></a>
+            </a>
+        </div>
+    </div>
+
+    <div th:id="${'plan'}" th:if="${#lists.isEmpty(planList)}">
+            <span class="span">待办(&nbsp;&nbsp;&nbsp;<a class="handoff" th:href="@{/home(mode='did')}"
+                                                         title="已完成"><i
+                    class="fa fa-calendar-check-o" aria-hidden="true"></i></a>&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;<a
+                    class="handoff"
+                    th:href="@{/home(mode='undo')}"
+                    title="未完成"><i
+                    class="fa fa-calendar-times-o" aria-hidden="true"></i></a>&nbsp;&nbsp;&nbsp;):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a
+                    onclick="openModal(event,'plan_overlay')"
+                    title="新增"><i
+                    class="fa fa-plus" aria-hidden="true"></i></a></span><br><br>
+        目前无要显示待办！
+    </div>
+
+</div>
+<div id="diary_statistics">
+    <canvas id="planChart" width="10" height="20"></canvas>
+</div>
+<div id="mood_statistics">
+    <canvas id="moodChart" width="10" height="20"></canvas>
+</div>
+
+
+<div id="plan_overlay" class="overlay">
+    <div id="plan_modal" class="modal">
+        <label>待办内容:<br>
+            <textarea name="plan_content"></textarea>
+        </label>
+        <br>
+        <label>
+            截止时间: <br>
+            <input type="datetime-local" name="plan_deadline">
+        </label><br>
+        <button onclick="closeModal(event,'plan_overlay')">提交</button>
+    </div>
+</div>
+
+<div id="word_overlay" class="overlay">
+    <div id="word_modal" class="modal">
+        <label>每日一言:<br>
+            <textarea name="word_content"></textarea>
+        </label>
+        <br>
+        <button onclick="closeModal(event,'word_overlay')">提交</button>
+    </div>
+</div>
+<script th:inline="javascript">
+    //===thyemleaf中的数据===
+    var diaryByMonth = /*[[${diaryCountByMonth}]]*/ [];
+    var diaryByMood = /*[[${diaryCountByMood}]]*/ [];
+    var planCount = /*[[${planCount}]]*/ [];
+    var mode = /*[[${mode}]]*/ 'undo';
+</script>
+
+<script>
+    let items;
+    if (mode === 'undo') {
+        items = document.getElementsByClassName('check');
+        //===为checkbox添加事件===
+        for (let i = 0; i < items.length; i++) {
+            items[i].addEventListener('click', function (event) {
+                var target = event.target;
+                var planId = target.getAttribute('planId');
+                $.ajax({
+                    url: "/plan/complete",
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        planId: planId
+                    },
+                    success: function (data) {
+                        // if (data.code === 200) {
+                        //     target.parentNode.parentNode.removeChild(target.parentNode);
+                        // }
+                        //===刷新页面===
+                        if (data.code === 200) {
+                            window.location.reload();
+                        }
+                    }
+                })
+            })
+        }
+    }
+
+    function openModal(event, eleId) {
+        console.log("Dream fish----->eleId:" + eleId);
+        //var targetElement = event.target; //获取触发事件的元素
+        document.getElementById(eleId).style.display = 'flex';
+    }
+
+    function closeModal(event, eleId) {
+        document.getElementById(eleId).style.display = 'none';
+
+        if (eleId === 'plan_overlay') {
+            $.ajax({
+                url: "/plan/create",
+                type: "post",
+                dataType: "json",
+                data: {
+                    content: $("textarea[name='plan_content']").val(),
+                    deadline: $("input[name='plan_deadline']").val()
+                },
+                success: function (data) {
+                    if (data.code === 200) {
+                        window.location.reload();
+                    }
+                }
+            })
+        } else if (eleId === 'word_overlay') {
+            console.log("Dream fish----->word_content:" + $("textarea[name='word_content']").val());
+            $.ajax({
+                url: "/word/create",
+                type: "post",
+                dataType: "json",
+                data: {
+                    content: $("textarea[name='word_content']").val()
+                },
+                success: function (data) {
+                    if (data.code === 200) {
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+    }
+</script>
+<script>
+    console.log("Dream fish----->diaryByMonth:" + diaryByMonth);
+    console.log("Dream fish----->diaryByMood:" + diaryByMood);
+
+    var plan = document.getElementById('planChart').getContext('2d');
+    var mood = document.getElementById('moodChart').getContext('2d');
+
+    let months = [];
+    for (let i = 0; i < 12; i++) {
+        let month = new Date(0, i).toLocaleString('default', {month: 'long'});
+        months.push(month);
+    }
+
+    // ===初始化图表样式===
+    Chart.defaults.backgroundColor = '#9BD0F5';
+    Chart.defaults.borderColor = '#CDC9C9';
+    Chart.defaults.color = '#000';
+    Chart.defaults.font.size = 13;
+    Chart.defaults.font.family = 'Microsoft YaHei';
+    Chart.defaults.borderWidth = 1.3;
+
+    // ===创建图表===
+    var planChart = new Chart(plan, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: '创建日记',
+                // data: [32, 30, 3, 5, 2],
+                data: diaryByMonth,
+                backgroundColor: 'rgba(255,174,185, 1)',
+                borderColor: 'rgba(255,174,185, 1)',
+                pointStyle: 'circle',
+                pointRadius: 5,
+                pointHoverRadius: 10,
+                borderWidth: 1.5
+            },
+                {
+                    label: '完成待办',
+                    // data: [1, 9, 3, 6, 2],
+                    data: planCount,
+                    backgroundColor: 'rgba(0,245,255, 0.9)',
+                    borderColor: 'rgba(0,245,255, 0.9)',
+                    pointStyle: 'circle',
+                    pointRadius: 5,
+                    pointHoverRadius: 10,
+                    borderWidth: 1.5
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: '日记与待办'
+                }
+            }
+        },
+    });
+
+    var moodChart = new Chart(mood, {
+        type: 'doughnut',
+        data: {
+            labels: ['开心', '一般', '难过'],
+            datasets: [{
+                // data: [12, 19, 3],
+                data: diaryByMood,
+                backgroundColor: ['rgba(255,174,185, 1)', 'rgb(255,222,173,1)', 'rgba(0,245,255, 0.9)'],
+                borderWidth: 1.5
+            },
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: '心情'
+                }
+            }
+        },
+    });
+</script>
+</body>
+
+</html>

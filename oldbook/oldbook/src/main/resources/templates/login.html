@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link th:href="@{/css/login.css}" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div id="login">
+    <div id="logo">
+        <img th:src="@{/pic/logo.png}" alt="logo" class="logo">
+    </div>
+    <form action="/user/login" method="post">
+        <div class="in_div" style="margin-top: 0;">
+            <label for="userName">用户名：</label>
+            <input type="text" name="userName" id="userName"
+                   th:placeholder="${#strings.isEmpty(userName)}?'请输入用户名':${userName}">
+        </div>
+        <br>
+        <span class="error" th:text="${#maps.isEmpty(errors)?'':errors['userName']}"></span>
+        <br>
+        <div class="in_div">
+            <label for="password">密&nbsp;&nbsp;码：</label>
+            <input type="password" name="password" id="password" placeholder="请输入密码">
+        </div>
+        <br>
+        <span class="error" th:text="${#maps.isEmpty(errors)?'':errors['password']}"></span>
+        <br>
+        <div class="other_div">
+            <a th:href="@{/to/register}" style="margin-right:100px;">注册</a>
+            <a id="forget" href="#" onclick="showAlert()">忘记密码?</a>
+        </div>
+        <br>
+        <div class="but_div">
+            <button type="submit">登录</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    function showAlert() {
+        alert("抱歉,暂不支持修改密码!");
+    }
+</script>
+</body>
+
+</html>

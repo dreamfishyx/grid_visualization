@@ -1,0 +1,48 @@
+--- # 日志配置
+logging:
+  level:
+    root: info
+  file:
+    name: ./logs/dream.log
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB
+      max-history: 7
+      total-size-cap: 1GB
+      file-name-pattern: ${LOG_FILE}-%d{yyyy-MM-dd}-%i.log.gz
+#  pattern:
+#    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} ===> %msg%n'
+
+--- # 数据库配置
+spring:
+  servlet:
+    multipart:
+      max-request-size: 3GB
+      max-file-size: 10MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/oldBook
+    username: root
+    password: yx198973
+    driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.dreamfish.sea.oldbook.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    safe-row-bounds-enabled: true #安全分页
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+--- #自定义配置
+my:
+  default:
+    word: 一只陈梦,一梦经年。
+    page-size: 5
+    data-size: 7
+  setting:
+    diary-location: diary
+    img-location: img
+    web-root: http://localhost:8080 # 默认的图片上传前缀

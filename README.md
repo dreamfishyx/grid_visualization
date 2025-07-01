@@ -21,12 +21,12 @@
 ```bash
 ❯ tree . -L 1 -d
 .
-├── backend				# 后端项目
-├── device				# python模拟代码
-├── doc					# 文档(ppt)
-├── docker_config		# docker compose文件和一些配置文件
-├── frontend			# 前端项目
-└── oldbook				# 一个很老的项目半成品(顺带上传了)
+├── backend					# 后端项目
+├── device					# python模拟代码
+├── doc						# 文档(ppt)
+├── docker_config			# docker compose文件和一些配置文件
+├── frontend				# 前端项目
+└── oldbook					# 一个很老的项目半成品(顺带上传了)
 ```
 
 
